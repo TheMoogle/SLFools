@@ -6,10 +6,10 @@ namespace SLFools
     public class Plugin : EXILED.Plugin
     {
         EventHandlers Eventhandler;
-        internal static bool isEnabled;
         internal static bool scalePlayers;
         internal static bool grenadeRandomSpawn;
         internal static bool randomAnnouncements;
+        internal bool isEnabled;
 
         public override void OnEnable()
         {
@@ -17,21 +17,17 @@ namespace SLFools
 
             if (!isEnabled) return;
 
-
-
             Eventhandler = new EventHandlers(this);
             Events.RoundStartEvent += Eventhandler.OnRoundStart;
             Events.RoundEndEvent += Eventhandler.OnRoundEnd;
             Events.PlayerSpawnEvent += Eventhandler.OnPlayerSpawn;
             Events.WaitingForPlayersEvent += Eventhandler.OnWaitingforPlayers;
-            Events.PlayerLeaveEvent += Eventhandler.OnPlayerLeave;
         }
 
         public override void OnDisable()
         {
             foreach (CoroutineHandle handle in Eventhandler.Coroutines)
                 Timing.KillCoroutines(handle);
-            Events.PlayerLeaveEvent -= Eventhandler.OnPlayerLeave;
             Events.WaitingForPlayersEvent -= Eventhandler.OnWaitingforPlayers;
             Events.PlayerSpawnEvent -= Eventhandler.OnPlayerSpawn;
             Events.RoundEndEvent -= Eventhandler.OnRoundEnd;

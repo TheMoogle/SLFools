@@ -70,45 +70,13 @@ namespace SLFools
 
         public void OnPlayerSpawn(PlayerSpawnEvent ev)
         {
-            if (!Plugin.isEnabled) return;
-
             if (Plugin.scalePlayers)
                 if (ev.Player.characterClassManager.CurClass != RoleType.Spectator)
                     SetPlayerScale(ev.Player.gameObject, UnityEngine.Random.Range(0.6f, 1.1f));
-
         }
 
-        // This is from AdminTools
-        internal void SetPlayerScale(GameObject target, float x, float y, float z)
-        {
-            try
-            {
-                NetworkIdentity identity = target.GetComponent<NetworkIdentity>();
-
-                target.transform.localScale = new Vector3(1 * x, 1 * y, 1 * z);
-
-                ObjectDestroyMessage destroyMessage = new ObjectDestroyMessage();
-                destroyMessage.netId = identity.netId;
-
-                foreach(GameObject player in PlayerManager.players)
-                {
-                    NetworkConnection playerCon = player.GetComponent<NetworkIdentity>().connectionToClient;
-
-                    if (player != target)
-                        playerCon.Send(destroyMessage, 0);
-
-                    object[] parameters = new object[] { identity, playerCon };
-                    typeof(NetworkServer).InvokeStaticMethod("SendSpawnMessage", parameters);
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Info($"Error: {e}");
-            }
-        }
-
-        // Also From AdminTools
-        internal void SetPlayerScale(GameObject target, float scale)
+        // From AdminTools
+        public void SetPlayerScale(GameObject target, float scale)
         {
             try
             {
@@ -144,7 +112,6 @@ namespace SLFools
         {
             foreach (CoroutineHandle handle in Coroutines)
                 Timing.KillCoroutines(handle);
-            if (!Plugin.isEnabled) return;
             if (Plugin.grenadeRandomSpawn)
                 Coroutines.Add(Timing.RunCoroutine(randomGrenadeTimer()));
             if (Plugin.randomAnnouncements)
@@ -159,37 +126,24 @@ namespace SLFools
         }
 
 
-        public void OnPlayerLeave(PlayerLeaveEvent ev)
-        {
-            if (!Plugin.isEnabled) return;
-        }
-
         public void OnWaitingforPlayers()
         {
             foreach (CoroutineHandle handle in Coroutines)
                 Timing.KillCoroutines(handle);
-            if (!Plugin.isEnabled) return;
         }
 
         public IEnumerator<float> randomAnnoucements()
         {
-            if (Plugin.randomAnnouncements)
-            {
                 for (;;)
                 {
                     yield return Timing.WaitForSeconds(rand.Next(60, 240));
                     int announcementid = rand.Next(0, cassieAnnounce.Count - 1);
                     Cassie.CassieMessage(cassieAnnounce[announcementid], true, false);
                 }
-            }
-            else
-                yield return Timing.WaitForSeconds(9999999f);
         }
 
         public IEnumerator<float> randomGrenadeTimer()
         {
-            if (Plugin.grenadeRandomSpawn)
-            {
                 for (;;)
                 {
                     yield return Timing.WaitForSeconds(rand.Next(60, 250));
@@ -226,12 +180,6 @@ namespace SLFools
                         }
                     }
                 }
-            } else
-            {
-                yield return Timing.WaitForSeconds(1000000f);
-            }
         }
-
-
     }
 }

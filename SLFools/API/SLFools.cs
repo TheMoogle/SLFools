@@ -8,10 +8,5 @@ namespace SLFools.API
         {
             return EventHandlers.cassieAnnounce;
         }
-
-        public static bool GetEnabedStatus()
-        {
-            return Plugin.isEnabled;
-        }
     }
 }

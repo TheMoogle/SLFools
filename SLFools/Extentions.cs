@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Reflection;
 
-// This is from AdminTools
 namespace SLFools
 {
-    internal static class Extentions
+	// This is from AdminTools
+	static class Extentions
     {
 		public static void InvokeStaticMethod(this Type type, string methodName, object[] param)
 		{
