@@ -70,9 +70,8 @@ namespace SLFools
 
         public void OnPlayerSpawn(PlayerSpawnEvent ev)
         {
-            if (Plugin.scalePlayers)
-                if (ev.Player.characterClassManager.CurClass != RoleType.Spectator)
-                    SetPlayerScale(ev.Player.gameObject, UnityEngine.Random.Range(0.6f, 1.1f));
+            if (Plugin.scalePlayers && ev.Player.characterClassManager.CurClass != RoleType.Spectator)
+                SetPlayerScale(ev.Player.gameObject, UnityEngine.Random.Range(0.6f, 1.1f));
         }
 
         // From AdminTools
@@ -137,8 +136,7 @@ namespace SLFools
                 for (;;)
                 {
                     yield return Timing.WaitForSeconds(rand.Next(60, 240));
-                    int announcementid = rand.Next(0, cassieAnnounce.Count - 1);
-                    Cassie.CassieMessage(cassieAnnounce[announcementid], true, false);
+                    Cassie.CassieMessage(cassieAnnounce[rand.Next(0, cassieAnnounce.Count - 1)], true, false);
                 }
         }
 
@@ -152,31 +150,42 @@ namespace SLFools
                         yield return Timing.WaitForSeconds(rand.Next(0, 5));
                         if (player.characterClassManager.CurClass != RoleType.Spectator)
                         {
-                                GrenadeSettings grenade;
-                                Vector3 spawnrand = new Vector3(UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(0f, 5f));
-                                GrenadeManager gm = player.GetComponent<GrenadeManager>();
-                                int grenadetype = rand.Next(0, 2);
-                                if (grenadetype == 0)
+                        GrenadeSettings grenade;
+                        GrenadeManager gm = player.GetComponent<GrenadeManager>();
+                        int grenadeType = rand.Next(0, 2);
+                        switch (grenadeType)
+                        {
+                            case 0:
                                 {
                                     grenade = gm.availableGrenades.FirstOrDefault(g => g.inventoryID == ItemType.GrenadeFrag);
                                     Grenade component = Object.Instantiate(grenade.grenadeInstance).GetComponent<FragGrenade>();
                                     component.InitData(gm, Vector3.zero, Vector3.zero, 0f);
                                     NetworkServer.Spawn(component.gameObject);
+                                    break;
                                 }
-                                else if (grenadetype == 1)
+                            case 1:
                                 {
                                     grenade = gm.availableGrenades.FirstOrDefault(g => g.inventoryID == ItemType.GrenadeFlash);
                                     Grenade component = Object.Instantiate(grenade.grenadeInstance).GetComponent<FlashGrenade>();
                                     component.InitData(gm, Vector3.zero, Vector3.zero, 0f);
                                     NetworkServer.Spawn(component.gameObject);
+                                    break;
                                 }
-                                else
+                            case 2:
                                 {
+                                    Vector3 spawnrand = new Vector3(UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(0f, 5f));
                                     grenade = gm.availableGrenades.FirstOrDefault(g => g.inventoryID == ItemType.SCP018);
                                     Grenade component = Object.Instantiate(grenade.grenadeInstance).GetComponent<Scp018Grenade>();
                                     component.InitData(gm, spawnrand, spawnrand, 0f);
                                     NetworkServer.Spawn(component.gameObject);
+                                    break;
                                 }
+                            default:
+                                {
+                                    Log.Info($"Somehow grenadeType is {grenadeType}. This should not happen so post your log and what you did to github issues :/");
+                                    break;
+                                }
+                        }
                         }
                     }
                 }
